@@ -89,33 +89,33 @@ player = character(game_display.get_width() / 2, game_display.get_height() - pla
 ##Start Menu
 game_start = False
 main_font = pygame.font.Font('resources/fonts/INVASION2000.ttf', 95) ##initialize the font for the main text as a ttf file in the fonts folder of this game
-sub_font = pygame.font.Font('resources/fonts/INVASION2000.ttf', 60)
+sub_font = pygame.font.Font('resources/fonts/INVASION2000.ttf', 60) ##initialize font for the subtext
 while game_start == False: ##While the player hasn't pressed anything to start the game 
-    text = main_font.render('SPACE INVADERS', False, (255,255,255))
-    subtext = sub_font.render('Press any key to continue', False, (255,255,255))
-    game_display.blit(bg, (0,0))
-    game_display.blit(text, (30, 100))
-    game_display.blit(subtext, (50, game_display.get_height() - 100))
+    text = main_font.render('SPACE INVADERS', False, (255,255,255))  ##creating the main text
+    subtext = sub_font.render('Press any key to continue', False, (255,255,255)) ##creating the sub text
+    game_display.blit(bg, (0,0)) ##filling the screen with the background
+    game_display.blit(text, (30, 40)) ##drawing the main text onto the screen
+    game_display.blit(subtext, (50, game_display.get_height() - 100)) ##drawing teh sub text onto the screen
     pygame.display.update()
     
     for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
+        if event.type == pygame.QUIT:  ##if the player presses the close button
+            pygame.quit()              ##exit the program
         if event.type == pygame.KEYDOWN:  ##if any key is pressed then start the game 
             game_start = True
 
 
 #Main Loop
 far_right = game_display.get_width() - player_ship.get_width() ##setting the farthest point right the player can go
-bullets = []
-enemy_bullets = []
-enemies = []
+bullets = []  #3empty list to hold all the player projectile objects on the screen
+enemy_bullets = []  ##holds the enemy projectile objects
+enemies = []  ##holds the enemy objects
 pygame.time.set_timer(pygame.USEREVENT + 1, 1000) ##set a check to perform a function every 100 milliseconds
 
 
 end_game = False
 while end_game == False:
-    pygame.time.delay(100)
+    pygame.time.delay(100)  ##the game updates its frames every 100 milliseconds
     
     if len(enemies) == 0:    ##if all the enemies have been killed, spawn more
         enemy_group()
@@ -126,7 +126,7 @@ while end_game == False:
             
         else:
             enemy.y += enemy_ship.get_height()    ##if the enemy reaches the end of the screen, they go one level lower 
-            enemy.x = 60
+            enemy.x = 60                        
             
         if enemy.y >= player.y - player.height: ##If the enemy passes the line, then its game over
             end_game = True
@@ -149,7 +149,7 @@ while end_game == False:
         if bullet.y > 0:  #if the bullet hasnt reached the top of the screen
             bullet.y -= bullet.vel    #move the bullet up
         else:
-            bullets.pop(bullets.index(bullet))    ##if the bullet is at the top, make it disappear 
+            bullets.pop(bullets.index(bullet))    ##if the bullet is at the top, remove it from the list of existing bullets
     
         for enemy in enemies:
             if bullet.y < enemy.y + enemy.height and bullet.y + bullet.height > enemy.y: ##if the bullet touches the bottom of the enemy's hitbox
@@ -160,22 +160,22 @@ while end_game == False:
                     
     for bullet in enemy_bullets: ##for every bullet shot by the enemy
         if bullet.y < game_display.get_height(): ##if the bullet hasn't reached the bottom of the screen
-            bullet.y += bullet.vel
+            bullet.y += bullet.vel               ##move the bullet down
         else:
-            enemy_bullets.pop(enemy_bullets.index(bullet))
+            enemy_bullets.pop(enemy_bullets.index(bullet))   ##if the bullet has reached the end of the screen, removew it from the list
             
-        if bullet.y < player.y + player.height and bullet.y + bullet.height > player.y:
+        if bullet.y < player.y + player.height and bullet.y + bullet.height > player.y:   ##if the bullet is within the player's frame
             if bullet.x > player.x and bullet.x + bullet.width < player.x + player.width:
-                end_game = True
+                end_game = True 
     
     keys = pygame.key.get_pressed()
     
     
-    if keys[pygame.K_SPACE]:
+    if keys[pygame.K_SPACE]:  ##if the space key is pressed
         if len(bullets) < 1:
-            bullets.append(projectile(player.x + player_ship.get_width() / 2, player.y, 10, 20)) #creates a 10x20 bullet centered on the ship 
+            bullets.append(projectile(player.x + player_ship.get_width() / 2, player.y, 10, 20)) #creates a bullet object centered on the player and puts it in the list of bullets 
 
-    elif keys[pygame.K_LEFT] and player.x != 0:
+    elif keys[pygame.K_LEFT] and player.x != 0:  ##if the player moves left and isn't at the end of the screen
         player.x -= player.vel
         
     elif keys[pygame.K_RIGHT] and player.x != far_right:
