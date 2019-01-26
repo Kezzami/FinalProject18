@@ -5,6 +5,8 @@ Created on Jan 7, 2019
 '''
 import pygame
 pygame.init()
+pygame.font.init()
+myfont = pygame.font.SysFont('Comic Sans MS', 100)
 
 game_display = pygame.display.set_mode((1000,700)) ##creating the game window
 pygame.display.set_caption("Space Invaders") ##naming the game window
@@ -17,9 +19,6 @@ enemy_ship = pygame.image.load("images/alien.png")
 enemy_ship = pygame.transform.scale(enemy_ship, (50, 50))
 explosion = pygame.image.load("images/explosion.png")
 explosion = pygame.transform.scale(explosion, (50,50))
-
-print(player_ship.get_height())
-print(game_display.get_height())
 
 class character(object):
     def __init__(self, x, y, width, height):
@@ -50,7 +49,8 @@ class enemy_alien(object):
         self.y = y 
         self.width = width 
         self.height = height 
-        self.vel = 10
+        self.vel = 30
+        self.has_shot = False
         
     def draw(self, win):
         win.blit(enemy_ship, (self.x, self.y))
@@ -67,8 +67,11 @@ def update_display():
     player.draw(game_display)
     for bullet in bullets:
         bullet.draw(game_display)
+    for bullet in enemy_bullets:
+        bullet.draw(game_display)
     for enemy in enemies:
         enemy.draw(game_display)
+    pygame.draw.line(game_display, (255,0,0), (0, game_display.get_height() - player.height * 2), (game_display.get_width(), game_display.get_height() - player.height * 2)) ##sets the point where aliens can't cross or its game over
     pygame.display.update()
     
     
@@ -79,14 +82,17 @@ def enemy_group():
         
     
 
-player = character(game_display.get_width() / 2, game_display.get_height() - player_ship.get_height(),50,50)
+player = character(game_display.get_width() / 2, game_display.get_height() - player_ship.get_height(),player_ship.get_width(), player_ship.get_height())
 #creates a player ship at the middle-bottom of the screen
 
 
 #Main Loop
 far_right = game_display.get_width() - player_ship.get_width() ##setting the farthest point right the player can go
 bullets = []
+enemy_bullets = []
 enemies = []
+pygame.time.set_timer(pygame.USEREVENT + 1, 1000) ##set a check to perform a function every 100 milliseconds
+
 
 end_game = False
 while end_game == False:
@@ -103,12 +109,24 @@ while end_game == False:
             enemy.y += enemy_ship.get_height()    ##if the enemy reaches the end of the screen, they go one level lower 
             enemy.x = 60
             
+        if enemy.y >= player.y - player.height: ##If the enemy passes the line, then its game over
+            end_game = True
+            
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             end_game = True
+            
+        if event.type == pygame.USEREVENT + 1:  ##for every 100 milliseconds
+            for enemy in enemies:
+                if enemy.has_shot == True:
+                    enemy.has_shot = False   ##if the enemy has already shot, do nothing and move onto the next enemy
+                    
+                elif enemy.has_shot == False:
+                    enemy.has_shot = True
+                    enemy_bullets.append(projectile(enemy.x + enemy_ship.get_width(), enemy.y, 10, 20))
+                    break
     
-    for bullet in bullets:  ##for every bullet still on the screen
-
+    for bullet in bullets:  ##for every bullet shot by the user still on the screen
         if bullet.y > 0:  #if the bullet hasnt reached the top of the screen
             bullet.y -= bullet.vel    #move the bullet up
         else:
@@ -121,7 +139,16 @@ while end_game == False:
                     bullets.pop(bullets.index(bullet))  ##remove the bullet so that it doesn't hit other enemies
                     enemies.pop(enemies.index(enemy)) ##remove the hit enemy from the list of currently alive enemies
                     
-        
+    for bullet in enemy_bullets: ##for every bullet shot by the enemy
+        if bullet.y < game_display.get_height(): ##if the bullet hasn't reached the bottom of the screen
+            bullet.y += bullet.vel
+        else:
+            enemy_bullets.pop(enemy_bullets.index(bullet))
+            
+        if bullet.y < player.y + player.height and bullet.y + bullet.height > player.y:
+            if bullet.x > player.x and bullet.x + bullet.width < player.x + player.width:
+                end_game = True
+    
     keys = pygame.key.get_pressed()
     
     
@@ -137,6 +164,11 @@ while end_game == False:
     ##allowing player-inputted movement and setting boundaries 
     
     update_display()
-    
-    
+
+if event.type != pygame.QUIT:   ##If the player closes the window out, don't show the game over screen
+    text = myfont.render('GAME OVER', False, (255,255,255))
+    game_display.blit(bg, (0,0))
+    game_display.blit(text, (200, 300)) ##display the text in white
+    pygame.display.update()
+    pygame.time.delay(3000)  #keep the text on screen for 3 seconds,l then quit the program
     
