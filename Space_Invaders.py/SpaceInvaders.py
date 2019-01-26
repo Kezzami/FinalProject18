@@ -71,6 +71,10 @@ def update_display():
     for enemy in enemies:
         enemy.draw(game_display)
     pygame.draw.line(game_display, (255,0,0), (0, game_display.get_height() - player.height * 2), (game_display.get_width(), game_display.get_height() - player.height * 2)) ##sets the point where aliens can't cross or its game over
+    ##Displaying the level the player is on 
+    game_font = pygame.font.Font('resources/fonts/INVASION2000.ttf', 40)
+    level_display = game_font.render(f'Wave: {wave_count}', False, (255,255,255))  
+    game_display.blit(level_display, (game_display.get_width() - 250, 0))       ##display the wave count in the upper right corner of the screen
     pygame.display.update()
     
     
@@ -95,7 +99,7 @@ while game_start == False: ##While the player hasn't pressed anything to start t
     subtext = sub_font.render('Press any key to continue', False, (255,255,255)) ##creating the sub text
     game_display.blit(bg, (0,0)) ##filling the screen with the background
     game_display.blit(text, (30, 40)) ##drawing the main text onto the screen
-    game_display.blit(subtext, (50, game_display.get_height() - 100)) ##drawing teh sub text onto the screen
+    game_display.blit(subtext, (45, game_display.get_height() - 100)) ##drawing teh sub text onto the screen
     pygame.display.update()
     
     for event in pygame.event.get():
@@ -111,6 +115,7 @@ bullets = []  #3empty list to hold all the player projectile objects on the scre
 enemy_bullets = []  ##holds the enemy projectile objects
 enemies = []  ##holds the enemy objects
 pygame.time.set_timer(pygame.USEREVENT + 1, 1000) ##set a check to perform a function every 100 milliseconds
+wave_count = 0 ##setting the current level/wave the player is on
 
 
 end_game = False
@@ -119,6 +124,7 @@ while end_game == False:
     
     if len(enemies) == 0:    ##if all the enemies have been killed, spawn more
         enemy_group()
+        wave_count += 1
     
     for enemy in enemies:  ##for every enemy currently alive 
         if enemy.x < game_display.get_width() - enemy_ship.get_width():    ##if the enemy hasn't reached the end of the screen
