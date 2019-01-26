@@ -5,19 +5,17 @@ Created on Jan 7, 2019
 '''
 import pygame
 pygame.init()
-pygame.font.init()
-myfont = pygame.font.SysFont('Comic Sans MS', 100)
-
+pygame.font.init() ##Initialize text
 game_display = pygame.display.set_mode((1000,700)) ##creating the game window
 pygame.display.set_caption("Space Invaders") ##naming the game window
 
-player_ship = pygame.image.load("images/player.png")  ##loading up the image of the player ship
+player_ship = pygame.image.load("resources/images/player.png")  ##loading up the image of the player ship
 player_ship = pygame.transform.scale(player_ship, (50, 50)) ##resizing the image of the player ship to be 50 pixels by 50 pixels
-bg = pygame.image.load("images/background.png")
+bg = pygame.image.load("resources/images/background.png")
 bg = pygame.transform.scale(bg, (1000,700))
-enemy_ship = pygame.image.load("images/alien.png")
+enemy_ship = pygame.image.load("resources/images/alien.png")
 enemy_ship = pygame.transform.scale(enemy_ship, (50, 50))
-explosion = pygame.image.load("images/explosion.png")
+explosion = pygame.image.load("resources/images/explosion.png")
 explosion = pygame.transform.scale(explosion, (50,50))
 
 class character(object):
@@ -56,13 +54,14 @@ class enemy_alien(object):
         win.blit(enemy_ship, (self.x, self.y))
 
     def hit(self, win):
+        ##Draws an explosion to demonstrate that the enemy has been hit 
         win.blit(explosion, (self.x, self.y))
         pygame.display.update()
         pygame.time.delay(50)
          
 
 def update_display():
-    #clears the screen and redraws the player every frame
+    #clears the screen and redraws every object for every frame
     game_display.blit(bg, (0,0))
     player.draw(game_display)
     for bullet in bullets:
@@ -77,6 +76,7 @@ def update_display():
     
 
 def enemy_group():
+    ##Creates a group of 10 enemies side by side
     for enemy_ship in range(10):
         enemies.append(enemy_alien(60 * (enemy_ship + 1), 200, 60, 60))
         
@@ -84,6 +84,25 @@ def enemy_group():
 
 player = character(game_display.get_width() / 2, game_display.get_height() - player_ship.get_height(),player_ship.get_width(), player_ship.get_height())
 #creates a player ship at the middle-bottom of the screen
+
+
+##Start Menu
+game_start = False
+main_font = pygame.font.Font('resources/fonts/INVASION2000.ttf', 95) ##initialize the font for the main text as a ttf file in the fonts folder of this game
+sub_font = pygame.font.Font('resources/fonts/INVASION2000.ttf', 60)
+while game_start == False: ##While the player hasn't pressed anything to start the game 
+    text = main_font.render('SPACE INVADERS', False, (255,255,255))
+    subtext = sub_font.render('Press any key to continue', False, (255,255,255))
+    game_display.blit(bg, (0,0))
+    game_display.blit(text, (30, 100))
+    game_display.blit(subtext, (50, game_display.get_height() - 100))
+    pygame.display.update()
+    
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+        if event.type == pygame.KEYDOWN:  ##if any key is pressed then start the game 
+            game_start = True
 
 
 #Main Loop
@@ -165,8 +184,10 @@ while end_game == False:
     
     update_display()
 
+myfont = pygame.font.SysFont('Comic Sans MS', 100)  ##Set the font to comic sans and size 100
+
 if event.type != pygame.QUIT:   ##If the player closes the window out, don't show the game over screen
-    text = myfont.render('GAME OVER', False, (255,255,255))
+    text = main_font.render('GAME OVER', False, (255,255,255))
     game_display.blit(bg, (0,0))
     game_display.blit(text, (200, 300)) ##display the text in white
     pygame.display.update()
