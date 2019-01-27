@@ -4,6 +4,7 @@ Created on Jan 7, 2019
 @author: hyobo
 '''
 import pygame
+from optparse import Option
 pygame.init()
 pygame.font.init() ##Initialize text
 game_display = pygame.display.set_mode((1000,700)) ##creating the game window
@@ -19,35 +20,36 @@ explosion = pygame.image.load("resources/images/explosion.png")
 explosion = pygame.transform.scale(explosion, (50,50))
 
 class character(object):
-    def __init__(self, x, y, width, height):
+    def __init__(self, x, y, width, height, vel):
         self.x = x
         self.y = y
         self.width = width
         self.height = height
-        self.vel = 30
+        self.vel = vel
         
     def draw(self, win):
         ##draws the character onto the game display
         win.blit(player_ship, (self.x,self.y))
             
 class projectile(object):
-    def __init__(self, x, y, width, height):
+    def __init__(self, x, y, width, height, vel):
         self.x = x
         self.y = y 
         self.width = width 
         self.height = height 
-        self.vel = 40
+        self.vel = vel
+        
         
     def draw(self, win):
         pygame.draw.rect(win, (255,255,255), (self.x, self.y, self.width, self.height))
         
 class enemy_alien(object):
-    def __init__(self, x, y, width, height):
+    def __init__(self, x, y, width, height, vel):
         self.x = x
         self.y = y 
         self.width = width 
         self.height = height 
-        self.vel = 30
+        self.vel = vel
         self.has_shot = False
         
     def draw(self, win):
@@ -82,32 +84,54 @@ def update_display():
 def enemy_group():
     ##Creates a group of 10 enemies side by side
     for enemy_ship in range(10):
-        enemies.append(enemy_alien(60 * (enemy_ship + 1), 200, 60, 60))
-        
-    
-
-player = character(game_display.get_width() / 2, game_display.get_height() - player_ship.get_height(),player_ship.get_width(), player_ship.get_height())
-#creates a player ship at the middle-bottom of the screen
-
+        enemies.append(enemy_alien(60 * (enemy_ship + 1), 200, 60, 60, vel))
 
 ##Start Menu
 game_start = False
 main_font = pygame.font.Font('resources/fonts/INVASION2000.ttf', 95) ##initialize the font for the main text as a ttf file in the fonts folder of this game
 sub_font = pygame.font.Font('resources/fonts/INVASION2000.ttf', 60) ##initialize font for the subtext
+option_font = pygame.font.Font('resources/fonts/INVASION2000.ttf', 40)
+
 while game_start == False: ##While the player hasn't pressed anything to start the game 
     text = main_font.render('SPACE INVADERS', False, (255,255,255))  ##creating the main text
-    subtext = sub_font.render('Press any key to continue', False, (255,255,255)) ##creating the sub text
+    subtext = sub_font.render('Choose your game mode', False, (255,255,255)) ##creating the sub text
+    option1 = option_font.render('Retro', False, (255,255,255))
+    option2 = option_font.render('Smooth', False, (255,255,255))
     game_display.blit(bg, (0,0)) ##filling the screen with the background
     game_display.blit(text, (30, 40)) ##drawing the main text onto the screen
-    game_display.blit(subtext, (45, game_display.get_height() - 100)) ##drawing teh sub text onto the screen
+    game_display.blit(subtext, (80, 600))
+    pygame.draw.rect(game_display, (0,255,127), (100, 300, 200, 100))  ##button for option 1 (retro)
+    pygame.draw.rect(game_display, (0, 191, 255), (700, 300, 200, 100)) ##button for option 2 (smooth)
+    game_display.blit(option1, (130, 320))  ##Adding text to the two buttons
+    game_display.blit(option2, (715, 320))
     pygame.display.update()
     
     for event in pygame.event.get():
         if event.type == pygame.QUIT:  ##if the player presses the close button
             pygame.quit()              ##exit the program
-        if event.type == pygame.KEYDOWN:  ##if any key is pressed then start the game 
-            game_start = True
 
+    mouse = pygame.mouse.get_pos()
+    if 100 < mouse[0] < 100 + 200 and 300 < mouse[1] < 300 + 100: ##if the mouse is within the bounds of the first button
+        pygame.draw.rect(game_display, (0, 128, 0), (100, 300, 200, 100)) ##highlight the button
+        game_display.blit(option1, (130, 320)) 
+        pygame.display.update()      
+        if pygame.mouse.get_pressed()[0]:
+            game_start = True
+            vel = 30    ##change how fast the game moves based on their choice
+            bullet_vel = 40
+            delay = 100
+                
+    if 700 < mouse[0] < 700 + 200 and 300 < mouse[1] < 300 + 100:
+        pygame.draw.rect(game_display, (0,0,255), (700, 300, 200, 100))
+        game_display.blit(option2, (715, 320))
+        pygame.display.update()
+        if pygame.mouse.get_pressed()[0]:
+            game_start = True
+            vel = 10    ##change the speed of the game based on their choice
+            bullet_vel = 15
+            delay = 10
+            
+        
 
 #Main Loop
 far_right = game_display.get_width() - player_ship.get_width() ##setting the farthest point right the player can go
@@ -116,11 +140,12 @@ enemy_bullets = []  ##holds the enemy projectile objects
 enemies = []  ##holds the enemy objects
 pygame.time.set_timer(pygame.USEREVENT + 1, 1000) ##set a check to perform a function every 100 milliseconds
 wave_count = 0 ##setting the current level/wave the player is on
-
+player = character(game_display.get_width() / 2, game_display.get_height() - player_ship.get_height(),player_ship.get_width(), player_ship.get_height(), vel)
+#creates a player ship at the middle-bottom of the screen
 
 end_game = False
 while end_game == False:
-    pygame.time.delay(100)  ##the game updates its frames every 100 milliseconds
+    pygame.time.delay(delay)  ##the game updates its frames every 100 milliseconds
     
     if len(enemies) == 0:    ##if all the enemies have been killed, spawn more
         enemy_group()
@@ -148,7 +173,7 @@ while end_game == False:
                     
                 elif enemy.has_shot == False:
                     enemy.has_shot = True
-                    enemy_bullets.append(projectile(enemy.x + enemy_ship.get_width(), enemy.y, 10, 20))
+                    enemy_bullets.append(projectile(enemy.x + enemy_ship.get_width(), enemy.y, 10, 20, bullet_vel))
                     break
     
     for bullet in bullets:  ##for every bullet shot by the user still on the screen
@@ -179,7 +204,7 @@ while end_game == False:
     
     if keys[pygame.K_SPACE]:  ##if the space key is pressed
         if len(bullets) < 1:
-            bullets.append(projectile(player.x + player_ship.get_width() / 2, player.y, 10, 20)) #creates a bullet object centered on the player and puts it in the list of bullets 
+            bullets.append(projectile(player.x + player_ship.get_width() / 2, player.y, 10, 20, bullet_vel)) #creates a bullet object centered on the player and puts it in the list of bullets 
 
     elif keys[pygame.K_LEFT] and player.x != 0:  ##if the player moves left and isn't at the end of the screen
         player.x -= player.vel
@@ -198,4 +223,3 @@ if event.type != pygame.QUIT:   ##If the player closes the window out, don't sho
     game_display.blit(text, (200, 300)) ##display the text in white
     pygame.display.update()
     pygame.time.delay(3000)  #keep the text on screen for 3 seconds,l then quit the program
-    
