@@ -138,14 +138,14 @@ far_right = game_display.get_width() - player_ship.get_width() ##setting the far
 bullets = []  #3empty list to hold all the player projectile objects on the screen
 enemy_bullets = []  ##holds the enemy projectile objects
 enemies = []  ##holds the enemy objects
-pygame.time.set_timer(pygame.USEREVENT + 1, 1000) ##set a check to perform a function every 100 milliseconds
+pygame.time.set_timer(pygame.USEREVENT + 1, 1000) ##set a check to perform a function every 1 second
 wave_count = 0 ##setting the current level/wave the player is on
 player = character(game_display.get_width() / 2, game_display.get_height() - player_ship.get_height(),player_ship.get_width(), player_ship.get_height(), vel)
 #creates a player ship at the middle-bottom of the screen
 
 end_game = False
 while end_game == False:
-    pygame.time.delay(delay)  ##the game updates its frames every 100 milliseconds
+    pygame.time.delay(delay)  ##the game updates its frames by a delay chosen by the player (retro vs smooth)
     
     if len(enemies) == 0:    ##if all the enemies have been killed, spawn more
         enemy_group()
@@ -166,7 +166,7 @@ while end_game == False:
         if event.type == pygame.QUIT:
             end_game = True
             
-        if event.type == pygame.USEREVENT + 1:  ##for every 100 milliseconds
+        if event.type == pygame.USEREVENT + 1:  ##for every 1 second
             for enemy in enemies:
                 if enemy.has_shot == True:
                     enemy.has_shot = False   ##if the enemy has already shot, do nothing and move onto the next enemy
@@ -215,8 +215,7 @@ while end_game == False:
     
     update_display()
 
-myfont = pygame.font.SysFont('Comic Sans MS', 100)  ##Set the font to comic sans and size 100
-
+##Game Over Screen
 if event.type != pygame.QUIT:   ##If the player closes the window out, don't show the game over screen
     text = main_font.render('GAME OVER', False, (255,255,255))
     game_display.blit(bg, (0,0))
