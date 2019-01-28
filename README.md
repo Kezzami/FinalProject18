@@ -10,3 +10,7 @@
 
 ##  MLA Sources
 * Tim, Tech With. “Pygame Tutorial #1 - Basic Movement and Key Presses.” YouTube, YouTube, 7 Nov. 2017, www.youtube.com/watch?v=i6xMBig-pP4&t=390s.
+
+##  Documents
+* https://drive.google.com/file/d/1ajLGLd0OcYAdoZdRwu6guQ4bjx1-RMYD/view?usp=sharing (flowchart)
+* * https://docs.google.com/presentation/d/1Wu7Iw34vP0njM19WgSqZWhiPedEfSAZK5dUTTvynI34/edit?usp=sharing (presentation)
