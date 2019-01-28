@@ -13,4 +13,4 @@
 
 ##  Documents
 * https://drive.google.com/file/d/1ajLGLd0OcYAdoZdRwu6guQ4bjx1-RMYD/view?usp=sharing (flowchart)
-* * https://docs.google.com/presentation/d/1Wu7Iw34vP0njM19WgSqZWhiPedEfSAZK5dUTTvynI34/edit?usp=sharing (presentation)
+* https://docs.google.com/presentation/d/1Wu7Iw34vP0njM19WgSqZWhiPedEfSAZK5dUTTvynI34/edit?usp=sharing (presentation)
